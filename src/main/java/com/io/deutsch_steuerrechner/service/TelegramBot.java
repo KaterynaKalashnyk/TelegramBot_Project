@@ -106,7 +106,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         usersExtraWork(chatId, messageText);
         usersVisitsToChurch(chatId, messageText);
         usersMedicalInsurace(chatId, messageText);
-
+        usersSalary(chatId, messageText);
+        usersProfession(chatId, messageText);
     }
 
     private void usersFamily (long chatId, String messageText){
