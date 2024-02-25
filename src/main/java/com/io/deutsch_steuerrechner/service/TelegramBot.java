@@ -1,33 +1,25 @@
 package com.io.deutsch_steuerrechner.service;
 
 import com.io.deutsch_steuerrechner.config.BotConfig;
-import com.io.deutsch_steuerrechner.database.User;
-import com.io.deutsch_steuerrechner.database.UserRep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import static com.io.deutsch_steuerrechner.service.Variables.*;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     final BotConfig config;
-    @Autowired
-    private UserRep userRep;
 
     public TelegramBot(BotConfig config) throws FileNotFoundException {
         this.config = config;
@@ -38,8 +30,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         botCommands.add(new BotCommand("/infotaxes", "info about taxes."));
         botCommands.add(new BotCommand("/help", "Information about bot."));
         try {
-            this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(),null));
-        }catch (TelegramApiException e){
+            this.execute(new SetMyCommands(botCommands, new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
     }
@@ -48,40 +40,30 @@ public class TelegramBot extends TelegramLongPollingBot {
     public String getBotUsername() {
         return config.botName;
     }
+
     @Override
-    public String getBotToken(){
+    public String getBotToken() {
         return config.botToken;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
-        if(update.hasMessage() && update.getMessage().hasText()){
+        if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
-            switch (messageText){
+            switch (messageText) {
                 case "/start":
-                    firstTimeRegisterOfUser(update.getMessage());
                     startCommandRecived(chatId, update.getMessage().getChat().getFirstName());
                     break;
                 case "/help":
                     sendMessege(chatId, COMMAND_HELP_TEXT);
                     break;
-                default: sendMessege(chatId, DEFAULT_UNKNOWN_COMMAND_MESSEGE);
+                default:
+                    sendMessege(chatId, DEFAULT_UNKNOWN_COMMAND_MESSEGE);
             }
         }
     }
-    private void firstTimeRegisterOfUser(Message message){
-        if(userRep.findById(message.getChatId()).isEmpty()){
-            var chatId = message.getChatId();
-            var chat = message.getChat();
-            User user = new User();
-            user.setCahtId(chatId);
-            user.setUserName(chat.getUserName());
-            user.setTimeOfFirstStart(new Timestamp(System.currentTimeMillis()));
-            userRep.save(user);
 
-        }
-    }
     private void startCommandRecived(long chatId, String usersName) {
         String answer = "Hallo, " + usersName + ". I'm Steuerrechner. I can help you to find out your tax group in Germany and how much money will you pay" +
                 "from your brutto-salary for taxes, " +
