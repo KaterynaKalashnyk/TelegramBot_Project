@@ -10,6 +10,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -202,6 +206,22 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void usersProfession(long chatId, String messageText){
         sendMessege(chatId, QUESTION_ABOUT_PROFESSION);
         String usersProfession = messageText;
+    }
+    public void handleTelegramMessage(String message) {
+        try (Connection connection = DatabaseConnector.getConnection()) {
+            String query = "SELECT * FROM your_table WHERE column_name = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, message);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        String result = resultSet.getString("column_name");
+                        System.out.println(result);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
 
