@@ -168,7 +168,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             case "Yes":
                 boolean extraWork = true;
                 sendMessege(chatId, QUESTION_ABOUT_SALARY_BY_MINIJOB);
-                String slaryByMinijob = messageText;
+                int salaryByMinijob = Integer.parseInt(messageText);
                 break;
             case "No":
                 extraWork = false;
@@ -201,28 +201,50 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private void usersSalary(long chatId, String messageText){
         sendMessege(chatId, QUESTION_ABOUT_SALARY);
-        String usersSalary = messageText;
+        int usersSalary = Integer.parseInt(messageText);
     }
     private void usersProfession(long chatId, String messageText){
         sendMessege(chatId, QUESTION_ABOUT_PROFESSION);
         String usersProfession = messageText;
     }
-    public void handleTelegramMessage(String message) {
-        try (Connection connection = DatabaseConnector.getConnection()) {
-            String query = "SELECT * FROM your_table WHERE column_name = ?";
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, message);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        String result = resultSet.getString("column_name");
-                        System.out.println(result);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    private void usersTaxGroup1(boolean isMarried, boolean children, long chatId){
+    if((isMarried=false) && (children=false)){
+        boolean usersTaxClass1 = true;
+        sendMessege(chatId, TAX_CLASS1);
+    }
+    }
+    private void usersTaxGroup2(boolean isMarried, boolean children, long chatId){
+        if((isMarried=false) && (children=true)){
+            boolean usersTaxClass2 = true;
+            sendMessege(chatId, TAX_CLASS2);
         }
     }
+    private void usersTaxGroup3(boolean isMarried, long chatId, boolean usersSalaryMore){
+        if((isMarried=true) && (usersSalaryMore = true) ){
+            boolean usersTaxClass3 = true;
+            sendMessege(chatId, TAX_CLASS3);
+        }
+    }private void usersTaxGroup4(boolean isMarried, boolean usersSalarySame, long chatId){
+        if((isMarried=true) && (usersSalarySame = true)){
+            boolean usersTaxClass4 = true;
+            sendMessege(chatId, TAX_CLASS4);
+        }
+    }
+    private void usersTaxGroup5(boolean isMarried, boolean usersSalaryMore, long chatId){
+        if((isMarried=true) && (usersSalaryMore=false)){
+            boolean usersTaxClass5 = true;
+            sendMessege(chatId, TAX_CLASS5);
+        }
+    }
+    private void usersTaxGroup6(boolean extraWork, long chatId){
+        if(extraWork = true){
+            boolean usersTaxClass6 = true;
+            sendMessege(chatId, TAX_CLASS6);
+        }
+    }
+
+
+
 }
 
 

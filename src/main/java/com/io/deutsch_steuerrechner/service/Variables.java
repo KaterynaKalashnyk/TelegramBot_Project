@@ -19,5 +19,12 @@ public class Variables {
     static final String QUESTION_ABOUT_MEDICAL_INSURACE = "Do you have privat or public medical insurace?";
     static final String QUESTION_ABOUT_PROFESSION = "What is your profession?";
     static final String QUESTION_ABOUT_SALARY = "How much do you earn?";
+    static final String TAX_CLASS1 = "Your tax class is class 1.";
+    static final String TAX_CLASS2 = "Your tax class is class 2.";
+    static final String TAX_CLASS3 = "Your tax class is class 3.";
+    static final String TAX_CLASS4 = "Your tax class is class 4.";
+    static final String TAX_CLASS5 = "Your tax class is class 5.";
+    static final String TAX_CLASS6 = "Your tax class is class 6 for your extra works salary.";
+
 
 }
