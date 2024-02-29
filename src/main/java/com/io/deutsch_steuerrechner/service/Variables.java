@@ -9,10 +9,9 @@ public class Variables {
             + "Type /help - Information how to use commands and bot.\n\n";
 
     static final String DEFAULT_UNKNOWN_COMMAND_MESSEGE = "Sorry, command wasn't recognized";
-    static final String QUESTION_ABOUT_FAMILY_STATUS = "Are you merried or single?";
+    static final String QUESTION_ABOUT_FAMILY_STATUS = "Are you married or single?";
     static final String QUESTION_ABOUT_SALARY_OF_PARTNER = "Earn you more, less or the same as your partner?";
     static final String QUESTION_ABOUT_CHILDREN = "Do you have children?";
-    static final String QUESTION_ABOUT_COUNT_OF_CHILDREN = "How much do you have children?";
     static final String QUESTION_ABOUT_MINIJOB = "Do you have Minijob or extra work?";
     static final String QUESTION_ABOUT_SALARY_BY_MINIJOB = "How much do you earn by minijob or extra work?";
     static final String QUESTION_ABOUT_CHURCH = "Do you visit the church, mosque, cathedral?";
@@ -25,6 +24,12 @@ public class Variables {
     static final String TAX_CLASS4 = "Your tax class is class 4.";
     static final String TAX_CLASS5 = "Your tax class is class 5.";
     static final String TAX_CLASS6 = "Your tax class is class 6 for your extra works salary.";
+    static final double solidatitatSteuerPercent = 5.5;
+    static final double kirchSteuerPercent = 8;
+    static final double arbeitlosVersicherungPercent = 1.3;
+    static final double lohnSteuerPercentBis58thausend = 14;
+    static final double getLohnSteuerPercentNach58thausend = 45;
+    static final double renteVersicherungPercent = 9.3;
 
 
 }
