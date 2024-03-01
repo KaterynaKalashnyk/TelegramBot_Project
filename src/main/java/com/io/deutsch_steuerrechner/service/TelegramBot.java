@@ -12,7 +12,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.awt.*;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +21,7 @@ import static com.io.deutsch_steuerrechner.service.Variables.*;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     final BotConfig config;
+
 
     public TelegramBot(BotConfig config) throws FileNotFoundException {
         this.config = config;
@@ -47,6 +47,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         return config.botToken;
     }
 
+    Boolean isMarried = true;
+    Boolean usersSalaryMore = true;
+    Boolean usersSalarySame = true;
+    Boolean children = true;
+    Boolean extraWork = true;
+    Boolean visitChurch = true;
+    Boolean publicInsurace = false;
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
@@ -63,50 +70,48 @@ public class TelegramBot extends TelegramLongPollingBot {
             long chatId = update.getCallbackQuery().getMessage().getChatId();
             String callbackData = update.getCallbackQuery().getData();
             if (callbackData.equals("User_is_Married")){
-                boolean isMarried = true;
+                isMarried = true;
                 moreOrLessSalary(chatId);
             } else if (callbackData.equals("User_is_Single")) {
-                boolean isMarried = false;
+                isMarried = false;
                 usersChild(chatId);
             } else if (callbackData.equals("User_earn_More")) {
-                boolean usersSalaryMore = true;
+                usersSalaryMore = true;
                 usersChild(chatId);
             } else if (callbackData.equals("User_earn_Less")) {
-                boolean usersSalaryMore = false;
+                usersSalaryMore = false;
                 usersChild(chatId);
             } else if (callbackData.equals("User_earn_Same")) {
-                boolean usersSalarySame = true;
+                usersSalarySame = true;
                 usersChild(chatId);
             } else if (callbackData.equals("User_have_Child")){
-                boolean children = true;
+                children = true;
                 usersExtraWork(chatId);
             } else if (callbackData.equals("User_havenot_Child")){
-                boolean children = false;
+                children = false;
                 usersExtraWork(chatId);
             }else if (callbackData.equals("User_have_Minijob")){
-                boolean extraWork = true;
+                extraWork = true;
                 sendMessage(chatId, QUESTION_ABOUT_SALARY_BY_MINIJOB);
                 double salaryByMinijob = Double.parseDouble(update.getMessage().getText());
                 usersVisitsToChurch(chatId);
             }else if (callbackData.equals("User_havenot_Minijob")){
-                boolean extraWork = false;
+                extraWork = false;
                 usersVisitsToChurch(chatId);
             } else if (callbackData.equals("User_have_Church")) {
-                boolean visitChurch = true;
+                visitChurch = true;
                 usersMedicalInsurace(chatId);
             } else if (callbackData.equals("User_havenot_Church")) {
-               boolean visitChurch = false;
+               visitChurch = false;
                 usersMedicalInsurace(chatId);
             }else if (callbackData.equals("User_public_Ins")) {
-                boolean publicInsurace = false;
+                publicInsurace = false;
                 sendMessage(chatId, QUESTION_ABOUT_SALARY);
                 double usersSalaryData = Double.parseDouble(update.getMessage().getText());
-                indefyTaxGroup();
             }else if (callbackData.equals("User_private_Ins")) {
-                boolean publicInsurace = true;
+                publicInsurace = true;
                 sendMessage(chatId, QUESTION_ABOUT_SALARY);
                 double usersSalaryData = Double.parseDouble(update.getMessage().getText());
-                indefyTaxGroup();
             }
         }
 
@@ -337,7 +342,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 
     }
-    public void indefyTaxGroup(boolean isMarried, boolean children, long chatId, double usersSalaryData, boolean usersSalaryMore, boolean usersSalarySame,boolean extraWork){
+    public void indefyTaxGroup( long chatId, double usersSalaryData){
         usersTaxGroup1(isMarried, children, chatId, usersSalaryData);
         usersTaxGroup2(isMarried, children, chatId, usersSalaryData);
         usersTaxGroup3(isMarried, chatId, usersSalaryMore, usersSalaryData);
@@ -346,62 +351,62 @@ public class TelegramBot extends TelegramLongPollingBot {
         usersTaxGroup6(extraWork, chatId, usersSalaryData);
     }
 
-    private void usersTaxGroup1(boolean isMarried, boolean children, long chatId, double usersSalaryData){
-    if((isMarried=false) && (children=false)){
+    private void usersTaxGroup1(Boolean isMarried, Boolean children, long chatId, double usersSalaryData){
+    if((this.isMarried =false) && (this.children =false)){
         boolean usersTaxClass1 = true;
         sendMessage(chatId, TAX_CLASS1);
-        countTaxesFromSalary1(chatId, usersSalaryData, children);
+        countTaxesFromSalary1(chatId, usersSalaryData, this.children);
     }
     }
-    private void usersTaxGroup2(boolean isMarried, boolean children, long chatId, double usersSalaryData){
-        if((isMarried=false) && (children=true)){
+    private void usersTaxGroup2( Boolean children, Boolean isMarried, long chatId, double usersSalaryData){
+        if((this.isMarried=false) && (this.children=true)){
             boolean usersTaxClass2 = true;
             sendMessage(chatId, TAX_CLASS2);
             countTaxesFromSalary2(chatId, usersSalaryData);
         }
     }
-    private void usersTaxGroup3(boolean isMarried, long chatId, boolean usersSalaryMore, double usersSalaryData){
-        if((isMarried=true) && (usersSalaryMore = true) ){
+    private void usersTaxGroup3( Boolean isMarried, long chatId, boolean usersSalaryMore, double usersSalaryData){
+        if((this.isMarried =true) && (usersSalaryMore = true) ){
             boolean usersTaxClass3 = true;
             sendMessage(chatId, TAX_CLASS3);
             countTaxesFromSalary3and5(chatId, usersSalaryData);
         }
-    }private void usersTaxGroup4(boolean isMarried, boolean usersSalarySame, long chatId, boolean children, double usersSalaryData){
-        if((isMarried=true) && (usersSalarySame = true)){
+    }private void usersTaxGroup4(Boolean isMarried, Boolean usersSalarySame, long chatId, boolean children, double usersSalaryData){
+        if((this.isMarried=true) && (this.usersSalarySame = true)){
             boolean usersTaxClass4 = true;
             sendMessage(chatId, TAX_CLASS4);
             countTaxesFromSalary4(chatId, usersSalaryData, children);
         }
     }
-    private void usersTaxGroup5(boolean isMarried, boolean usersSalaryMore, long chatId, double usersSalaryData){
-        if((isMarried=true) && (usersSalaryMore=false)){
+    private void usersTaxGroup5(Boolean isMarried, Boolean usersSalaryMore, long chatId, double usersSalaryData){
+        if((this.isMarried=true) && (this.usersSalaryMore=false)){
             boolean usersTaxClass5 = true;
             sendMessage(chatId, TAX_CLASS5);
             countTaxesFromSalary3and5(chatId, usersSalaryData);
         }
     }
-    private void usersTaxGroup6(boolean extraWork, long chatId, double usersSalaryData){
-        if(extraWork = true){
+    private void usersTaxGroup6(Boolean extraWork, long chatId, double usersSalaryData){
+        if(this.extraWork = true){
             boolean usersTaxClass6 = true;
             sendMessage(chatId, TAX_CLASS6);
             countTaxesFromExtraworkSalary(chatId, usersSalaryData);
         }
     }
 
-    private void countTaxesFromSalary1 (long chatId, double usersSalaryData, boolean children){
+    private void countTaxesFromSalary1 (long chatId, double usersSalaryData, Boolean children){
        double solid_fromSalary1 = (usersSalaryData * solidatitatSteuerPercent) / 100;
        double kirch_fromSalary1 = (usersSalaryData * kirchSteuerPercent) / 100;
        double renteVer_fromSalary1 = (usersSalaryData * renteVersicherungPercent) / 100;
        double arbeitlosVer_fromSalary1 = (usersSalaryData * arbeitlosVersicherungPercent) / 100;
        double lohnSteuer_fromSalary1 = (usersSalaryData * lohnSteuerPercentBis58thausend ) /100;
        double krankVer_fromSalary1 = (usersSalaryData * 7.3) / 100;
-        if(children = true){
+        if(this.children = true){
             double pflegeWithChildren_fromSalary1 = (usersSalaryData * 1.7) / 100;
             double amountOfTaxesWithChildren1 = solid_fromSalary1 + kirch_fromSalary1 + renteVer_fromSalary1 + arbeitlosVer_fromSalary1 + krankVer_fromSalary1 + pflegeWithChildren_fromSalary1 + lohnSteuer_fromSalary1;
             double nettoSalaryWithChildren1 = usersSalaryData - amountOfTaxesWithChildren1;
             String theEndOfCount_class1_withChild = "Your brutto-slary is " + usersSalaryData + " and your netto-salary is " + nettoSalaryWithChildren1 + ".";
             sendMessage(chatId, theEndOfCount_class1_withChild);
-        } else if (children = false) {
+        } else if (this.children = false) {
             double pflegeWithoutChildren_fromSalary1 = (usersSalaryData * (1.7 + 0.35)) / 100;
             double amountOfTaxesWithoutChildren1 = solid_fromSalary1 + kirch_fromSalary1 + renteVer_fromSalary1 + arbeitlosVer_fromSalary1 + krankVer_fromSalary1 + pflegeWithoutChildren_fromSalary1 + lohnSteuer_fromSalary1;
             double nettoSalaryWithoutChildren1 = usersSalaryData - amountOfTaxesWithoutChildren1;
@@ -431,19 +436,19 @@ public class TelegramBot extends TelegramLongPollingBot {
         sendMessage(chatId, theEndOfCount_class3);
     }
 
-    private void countTaxesFromSalary4 (long chatId, double usersSalaryData, boolean children){
+    private void countTaxesFromSalary4 (long chatId, double usersSalaryData, Boolean children){
 
         double kirch_fromSalary4 = (usersSalaryData * kirchSteuerPercent) / 100;
         double renteVer_fromSalary4 = (usersSalaryData * 18.6) / 100;
         double arbeitlosVer_fromSalary4 = (usersSalaryData * 2.5) / 100;
         double krankVer_fromSalary4 = (usersSalaryData * 14.6) / 100;
-        if(children = true){
+        if(this.children = true){
             double pflegeWithChildren_fromSalary4 = (usersSalaryData * 3.05) / 100;
             double amountOfTaxesWithChildren4 = kirch_fromSalary4 + renteVer_fromSalary4 + arbeitlosVer_fromSalary4 + krankVer_fromSalary4 + pflegeWithChildren_fromSalary4;
             double nettoSalaryWithChildren4 = usersSalaryData - amountOfTaxesWithChildren4;
             String theEndOfCount_class4_withChild = "Your brutto-slary is " + usersSalaryData + " and your netto-salary is " + nettoSalaryWithChildren4 + ".";
             sendMessage(chatId, theEndOfCount_class4_withChild);
-        } else if (children = false) {
+        } else if (this.children = false) {
             double pflegeWithoutChildren_fromSalary4 = (usersSalaryData * (3.05 + 0.35)) / 100;
             double amountOfTaxesWithoutChildren4 = kirch_fromSalary4 + renteVer_fromSalary4 + arbeitlosVer_fromSalary4 + krankVer_fromSalary4 + pflegeWithoutChildren_fromSalary4;
             double nettoSalaryWithoutChildren4 = usersSalaryData - amountOfTaxesWithoutChildren4;
