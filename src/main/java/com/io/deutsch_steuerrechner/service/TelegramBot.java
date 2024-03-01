@@ -22,6 +22,8 @@ import static com.io.deutsch_steuerrechner.service.Variables.*;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     final BotConfig config;
+    InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+    List<List<InlineKeyboardButton>> inlineKeyboardButtonsList = new ArrayList<>();
 
     public TelegramBot(BotConfig config) throws FileNotFoundException {
         this.config = config;
@@ -55,11 +57,45 @@ public class TelegramBot extends TelegramLongPollingBot {
             switch (messageText) {
                 case "/start" -> startCommandRecived(chatId, update.getMessage().getChat().getFirstName());
                 case "/help" -> sendMessage(chatId, COMMAND_HELP_TEXT);
-                case "/count" -> usersFamily(chatId, messageText);
+                case "/count" -> usersFamily(chatId);
                 case "/infotaxes" -> sendMessage(chatId, taxesAllInfo);
                 default -> sendMessage(chatId, DEFAULT_UNKNOWN_COMMAND_MESSEGE);
             }
+        } else if (update.hasCallbackQuery()) {
+            long chatId = update.getCallbackQuery().getMessage().getChatId();
+            String callbackData = update.getCallbackQuery().getData();
+            String messageText = update.getMessage().getText();
+            if (callbackData.equals("User_is_Married")){
+                boolean isMarried = true;
+                moreOrLessSalary(chatId);
+            } else if (callbackData.equals("User_is_Single")) {
+                boolean isMarried = false;
+                usersChild(chatId);
+            } else if (callbackData.equals("User_earn_More")) {
+                boolean usersSalaryMore = true;
+                usersChild(chatId);
+            } else if (callbackData.equals("User_earn_Less")) {
+                boolean usersSalaryMore = false;
+                usersChild(chatId);
+            } else if (callbackData.equals("User_earn_Same")) {
+                boolean usersSalarySame = true;
+                usersChild(chatId);
+            } else if (callbackData.equals("User_have_Child")){
+                boolean children = true;
+                usersExtraWork(chatId);
+            } else if (callbackData.equals("User_havenot_Child")){
+                boolean children = false;
+                usersExtraWork(chatId);
+            }else if (callbackData.equals("User_have_Minijob")){
+                boolean extraWork = true;
+                getUsersSalaryByExtraWork(chatId, messageText);
+            }else if (callbackData.equals("User_havenot_Minijob")){
+                boolean extraWork = false;
+                usersVisitsToChurch(chatId,messageText);
+            }
+
         }
+
     }
 
     private void startCommandRecived(long chatId, String usersName) {
@@ -92,13 +128,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     }
 
-    InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-    List<List<InlineKeyboardButton>> inlineKeyboardButtonsList = new ArrayList<>();
-    public void usersFamily (long chatId, String messageText){
-       //sendMessage(chatId, QUESTION_ABOUT_FAMILY_STATUS);
+
+
+
+    public void usersFamily (long chatId){
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(QUESTION_ABOUT_FAMILY_STATUS);
+
         List<InlineKeyboardButton> inlineKeyboardButtonsOfFamilyStatus = new ArrayList<>();
 
         InlineKeyboardButton marriedButtton = new InlineKeyboardButton();
@@ -121,71 +158,105 @@ public class TelegramBot extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
 
-        switch (messageText){
-            case "Married":
-                boolean isMarried = true;
-                sendMessage(chatId, QUESTION_ABOUT_SALARY_OF_PARTNER);
-                moreOrLessSalary(chatId, messageText);
-                break;
+    }
+    public void moreOrLessSalary(long chatId){
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(QUESTION_ABOUT_SALARY_OF_PARTNER);
 
+        List<InlineKeyboardButton> inlineKeyboardButtonsOfPartnersSalary = new ArrayList<>();
 
-            case "Single":
-                isMarried = false;
-                usersChild(chatId, messageText);
-                break;
+        InlineKeyboardButton earnMoreButtton = new InlineKeyboardButton();
+        earnMoreButtton.setText("More");
+        earnMoreButtton.setCallbackData("User_earn_More");
+
+        InlineKeyboardButton earnLessButtton = new InlineKeyboardButton();
+        earnLessButtton.setText("Less");
+        earnLessButtton.setCallbackData("User_earn_Less");
+
+        InlineKeyboardButton earnSameButtton = new InlineKeyboardButton();
+        earnSameButtton.setText("Same");
+        earnSameButtton.setCallbackData("User_earn_Same");
+
+        inlineKeyboardButtonsOfPartnersSalary.add(earnMoreButtton);
+        inlineKeyboardButtonsOfPartnersSalary.add(earnLessButtton);
+        inlineKeyboardButtonsOfPartnersSalary.add(earnSameButtton);
+
+        inlineKeyboardButtonsList.add(inlineKeyboardButtonsOfPartnersSalary);
+        inlineKeyboardMarkup.setKeyboard(inlineKeyboardButtonsList);
+        message.setReplyMarkup(inlineKeyboardMarkup);
+        try {
+            execute(message);
+        }catch (TelegramApiException e){
+            throw new RuntimeException(e);
         }
 
     }
-    public void moreOrLessSalary(long chatId, String messageText){
-        switch (messageText){
-            case "More":
-                boolean usersSalaryMore = true;
-                usersChild(chatId, messageText);
-                break;
 
-            case "Less":
-                usersSalaryMore = false;
-                usersChild(chatId, messageText);
-                break;
+    public void usersChild(long chatId){
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(QUESTION_ABOUT_CHILDREN);
 
-            case "Same":
-                boolean usersSalarySame = true;
-                usersChild(chatId, messageText);
-                break;
+        List<InlineKeyboardButton> inlineKeyboardButtonsOfChild = new ArrayList<>();
+
+        InlineKeyboardButton haveChildButtton = new InlineKeyboardButton();
+        haveChildButtton.setText("Yes");
+        haveChildButtton.setCallbackData("User_have_Child");
+
+        InlineKeyboardButton noChildButtton = new InlineKeyboardButton();
+        noChildButtton.setText("No");
+        noChildButtton.setCallbackData("User_havenot_Child");
+
+
+        inlineKeyboardButtonsOfChild.add(haveChildButtton);
+        inlineKeyboardButtonsOfChild.add(noChildButtton);
+
+        inlineKeyboardButtonsList.add(inlineKeyboardButtonsOfChild);
+        inlineKeyboardMarkup.setKeyboard(inlineKeyboardButtonsList);
+        message.setReplyMarkup(inlineKeyboardMarkup);
+        try {
+            execute(message);
+        }catch (TelegramApiException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void usersExtraWork (long chatId){
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(QUESTION_ABOUT_MINIJOB);
+
+        List<InlineKeyboardButton> inlineKeyboardButtonsOfExtraWork = new ArrayList<>();
+
+        InlineKeyboardButton extraWorkButtton = new InlineKeyboardButton();
+        extraWorkButtton.setText("Yes");
+        extraWorkButtton.setCallbackData("User_have_Minijob");
+
+        InlineKeyboardButton noExtraWorkButtton = new InlineKeyboardButton();
+        noExtraWorkButtton.setText("No");
+        noExtraWorkButtton.setCallbackData("User_havenot_Minijob");
+
+
+        inlineKeyboardButtonsOfExtraWork.add(extraWorkButtton);
+        inlineKeyboardButtonsOfExtraWork.add(noExtraWorkButtton);
+
+        inlineKeyboardButtonsList.add(inlineKeyboardButtonsOfExtraWork);
+        inlineKeyboardMarkup.setKeyboard(inlineKeyboardButtonsList);
+        message.setReplyMarkup(inlineKeyboardMarkup);
+        try {
+            execute(message);
+        }catch (TelegramApiException e){
+            throw new RuntimeException(e);
         }
 
     }
 
-    public void usersChild(long chatId, String messageText){
-        sendMessage(chatId, QUESTION_ABOUT_CHILDREN);
-        switch (messageText){
-            case "Yes":
-                boolean children = true;
-                usersExtraWork(chatId, messageText);
-                break;
-            case "No":
-                children = false;
-                usersExtraWork(chatId, messageText);
-                break;
-        }
+    public void getUsersSalaryByExtraWork(long chatId, String messageText){
+        sendMessage(chatId, QUESTION_ABOUT_SALARY_BY_MINIJOB);
+        double salaryByMinijob = Integer.parseInt(messageText);
     }
 
-    public void usersExtraWork (long chatId, String messageText){
-        sendMessage(chatId, QUESTION_ABOUT_MINIJOB);
-        switch (messageText){
-            case "Yes":
-                boolean extraWork = true;
-                sendMessage(chatId, QUESTION_ABOUT_SALARY_BY_MINIJOB);
-                double salaryByMinijob = Integer.parseInt(messageText);
-                usersVisitsToChurch(chatId,messageText);
-                break;
-            case "No":
-                extraWork = false;
-                usersVisitsToChurch(chatId,messageText);
-                break;
-        }
-
-    }
     public void usersVisitsToChurch(long chatId, String messageText){
         sendMessage(chatId, QUESTION_ABOUT_CHURCH);
         switch (messageText){
