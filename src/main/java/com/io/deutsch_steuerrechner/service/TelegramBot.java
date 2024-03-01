@@ -92,16 +92,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     }
 
-
+    InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+    List<List<InlineKeyboardButton>> inlineKeyboardButtonsList = new ArrayList<>();
     public void usersFamily (long chatId, String messageText){
        //sendMessage(chatId, QUESTION_ABOUT_FAMILY_STATUS);
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText("Are u married?");
-
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> inlineKeyboardButtonsList = new ArrayList<>();
-        List<InlineKeyboardButton> inlineKeyboardButtons = new ArrayList<>();
+        message.setText(QUESTION_ABOUT_FAMILY_STATUS);
+        List<InlineKeyboardButton> inlineKeyboardButtonsOfFamilyStatus = new ArrayList<>();
 
         InlineKeyboardButton marriedButtton = new InlineKeyboardButton();
         marriedButtton.setText("Married");
@@ -111,12 +109,17 @@ public class TelegramBot extends TelegramLongPollingBot {
         singleButton.setText("Single");
         singleButton.setCallbackData("User_is_Single");
 
-        inlineKeyboardButtons.add(marriedButtton);
-        inlineKeyboardButtons.add(singleButton);
+        inlineKeyboardButtonsOfFamilyStatus.add(marriedButtton);
+        inlineKeyboardButtonsOfFamilyStatus.add(singleButton);
 
-        inlineKeyboardButtonsList.add(inlineKeyboardButtons);
+        inlineKeyboardButtonsList.add(inlineKeyboardButtonsOfFamilyStatus);
         inlineKeyboardMarkup.setKeyboard(inlineKeyboardButtonsList);
         message.setReplyMarkup(inlineKeyboardMarkup);
+        try {
+            execute(message);
+        }catch (TelegramApiException e){
+            throw new RuntimeException(e);
+        }
 
         switch (messageText){
             case "Married":
