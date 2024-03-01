@@ -22,8 +22,6 @@ import static com.io.deutsch_steuerrechner.service.Variables.*;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     final BotConfig config;
-    InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-    List<List<InlineKeyboardButton>> inlineKeyboardButtonsList = new ArrayList<>();
 
     public TelegramBot(BotConfig config) throws FileNotFoundException {
         this.config = config;
@@ -64,7 +62,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         } else if (update.hasCallbackQuery()) {
             long chatId = update.getCallbackQuery().getMessage().getChatId();
             String callbackData = update.getCallbackQuery().getData();
-            String messageText = update.getMessage().getText();
             if (callbackData.equals("User_is_Married")){
                 boolean isMarried = true;
                 moreOrLessSalary(chatId);
@@ -88,12 +85,29 @@ public class TelegramBot extends TelegramLongPollingBot {
                 usersExtraWork(chatId);
             }else if (callbackData.equals("User_have_Minijob")){
                 boolean extraWork = true;
-                getUsersSalaryByExtraWork(chatId, messageText);
+                sendMessage(chatId, QUESTION_ABOUT_SALARY_BY_MINIJOB);
+                double salaryByMinijob = Double.parseDouble(update.getMessage().getText());
+                usersVisitsToChurch(chatId);
             }else if (callbackData.equals("User_havenot_Minijob")){
                 boolean extraWork = false;
-                usersVisitsToChurch(chatId,messageText);
+                usersVisitsToChurch(chatId);
+            } else if (callbackData.equals("User_have_Church")) {
+                boolean visitChurch = true;
+                usersMedicalInsurace(chatId);
+            } else if (callbackData.equals("User_havenot_Church")) {
+               boolean visitChurch = false;
+                usersMedicalInsurace(chatId);
+            }else if (callbackData.equals("User_public_Ins")) {
+                boolean publicInsurace = false;
+                sendMessage(chatId, QUESTION_ABOUT_SALARY);
+                double usersSalaryData = Double.parseDouble(update.getMessage().getText());
+                indefyTaxGroup();
+            }else if (callbackData.equals("User_private_Ins")) {
+                boolean publicInsurace = true;
+                sendMessage(chatId, QUESTION_ABOUT_SALARY);
+                double usersSalaryData = Double.parseDouble(update.getMessage().getText());
+                indefyTaxGroup();
             }
-
         }
 
     }
@@ -135,6 +149,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(QUESTION_ABOUT_FAMILY_STATUS);
+        InlineKeyboardMarkup inlineKeyboardMarkupOf_FamilyStatus = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> inlineKeyboardButtonsListOf_FamilyStatus = new ArrayList<>();
 
         List<InlineKeyboardButton> inlineKeyboardButtonsOfFamilyStatus = new ArrayList<>();
 
@@ -149,9 +165,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         inlineKeyboardButtonsOfFamilyStatus.add(marriedButtton);
         inlineKeyboardButtonsOfFamilyStatus.add(singleButton);
 
-        inlineKeyboardButtonsList.add(inlineKeyboardButtonsOfFamilyStatus);
-        inlineKeyboardMarkup.setKeyboard(inlineKeyboardButtonsList);
-        message.setReplyMarkup(inlineKeyboardMarkup);
+        inlineKeyboardButtonsListOf_FamilyStatus.add(inlineKeyboardButtonsOfFamilyStatus);
+        inlineKeyboardMarkupOf_FamilyStatus.setKeyboard(inlineKeyboardButtonsListOf_FamilyStatus);
+        message.setReplyMarkup(inlineKeyboardMarkupOf_FamilyStatus);
         try {
             execute(message);
         }catch (TelegramApiException e){
@@ -163,6 +179,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(QUESTION_ABOUT_SALARY_OF_PARTNER);
+        InlineKeyboardMarkup inlineKeyboardMarkupOf_MoreOrLess = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> inlineKeyboardButtonsListOf_MoreOrLess = new ArrayList<>();
 
         List<InlineKeyboardButton> inlineKeyboardButtonsOfPartnersSalary = new ArrayList<>();
 
@@ -182,9 +200,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         inlineKeyboardButtonsOfPartnersSalary.add(earnLessButtton);
         inlineKeyboardButtonsOfPartnersSalary.add(earnSameButtton);
 
-        inlineKeyboardButtonsList.add(inlineKeyboardButtonsOfPartnersSalary);
-        inlineKeyboardMarkup.setKeyboard(inlineKeyboardButtonsList);
-        message.setReplyMarkup(inlineKeyboardMarkup);
+        inlineKeyboardButtonsListOf_MoreOrLess.add(inlineKeyboardButtonsOfPartnersSalary);
+        inlineKeyboardMarkupOf_MoreOrLess.setKeyboard(inlineKeyboardButtonsListOf_MoreOrLess);
+        message.setReplyMarkup(inlineKeyboardMarkupOf_MoreOrLess);
         try {
             execute(message);
         }catch (TelegramApiException e){
@@ -197,6 +215,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(QUESTION_ABOUT_CHILDREN);
+        InlineKeyboardMarkup inlineKeyboardMarkupOf_Child = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> inlineKeyboardButtonsListOf_Child = new ArrayList<>();
 
         List<InlineKeyboardButton> inlineKeyboardButtonsOfChild = new ArrayList<>();
 
@@ -212,9 +232,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         inlineKeyboardButtonsOfChild.add(haveChildButtton);
         inlineKeyboardButtonsOfChild.add(noChildButtton);
 
-        inlineKeyboardButtonsList.add(inlineKeyboardButtonsOfChild);
-        inlineKeyboardMarkup.setKeyboard(inlineKeyboardButtonsList);
-        message.setReplyMarkup(inlineKeyboardMarkup);
+        inlineKeyboardButtonsListOf_Child.add(inlineKeyboardButtonsOfChild);
+        inlineKeyboardMarkupOf_Child.setKeyboard(inlineKeyboardButtonsListOf_Child);
+        message.setReplyMarkup(inlineKeyboardMarkupOf_Child);
         try {
             execute(message);
         }catch (TelegramApiException e){
@@ -226,6 +246,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(QUESTION_ABOUT_MINIJOB);
+        InlineKeyboardMarkup inlineKeyboardMarkupOf_ExtraWork = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> inlineKeyboardButtonsListOf_ExtraWork = new ArrayList<>();
 
         List<InlineKeyboardButton> inlineKeyboardButtonsOfExtraWork = new ArrayList<>();
 
@@ -241,9 +263,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         inlineKeyboardButtonsOfExtraWork.add(extraWorkButtton);
         inlineKeyboardButtonsOfExtraWork.add(noExtraWorkButtton);
 
-        inlineKeyboardButtonsList.add(inlineKeyboardButtonsOfExtraWork);
-        inlineKeyboardMarkup.setKeyboard(inlineKeyboardButtonsList);
-        message.setReplyMarkup(inlineKeyboardMarkup);
+        inlineKeyboardButtonsListOf_ExtraWork.add(inlineKeyboardButtonsOfExtraWork);
+        inlineKeyboardMarkupOf_ExtraWork.setKeyboard(inlineKeyboardButtonsListOf_ExtraWork);
+        message.setReplyMarkup(inlineKeyboardMarkupOf_ExtraWork);
         try {
             execute(message);
         }catch (TelegramApiException e){
@@ -252,50 +274,78 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     }
 
-    public void getUsersSalaryByExtraWork(long chatId, String messageText){
-        sendMessage(chatId, QUESTION_ABOUT_SALARY_BY_MINIJOB);
-        double salaryByMinijob = Integer.parseInt(messageText);
+    public void usersVisitsToChurch(long chatId){
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(QUESTION_ABOUT_CHURCH);
+        InlineKeyboardMarkup inlineKeyboardMarkupOf_Church = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> inlineKeyboardButtonsListOf_Church = new ArrayList<>();
+
+        List<InlineKeyboardButton> inlineKeyboardButtonsOfChurch = new ArrayList<>();
+
+        InlineKeyboardButton visitChurchButtton = new InlineKeyboardButton();
+        visitChurchButtton.setText("Yes");
+        visitChurchButtton.setCallbackData("User_have_Church");
+
+        InlineKeyboardButton noVisitChurchButtton = new InlineKeyboardButton();
+        noVisitChurchButtton.setText("No");
+        noVisitChurchButtton.setCallbackData("User_havenot_Church");
+
+
+        inlineKeyboardButtonsOfChurch.add(visitChurchButtton);
+        inlineKeyboardButtonsOfChurch.add(noVisitChurchButtton);
+
+        inlineKeyboardButtonsListOf_Church.add(inlineKeyboardButtonsOfChurch);
+        inlineKeyboardMarkupOf_Church.setKeyboard(inlineKeyboardButtonsListOf_Church);
+        message.setReplyMarkup(inlineKeyboardMarkupOf_Church);
+        try {
+            execute(message);
+        }catch (TelegramApiException e){
+            throw new RuntimeException(e);
+        }
     }
 
-    public void usersVisitsToChurch(long chatId, String messageText){
-        sendMessage(chatId, QUESTION_ABOUT_CHURCH);
-        switch (messageText){
-            case "Yes":
-                boolean visitChurch = true;
-                usersMedicalInsurace(chatId, messageText);
-                break;
-            case "No":
-                visitChurch = false;
-                usersMedicalInsurace(chatId, messageText);
-                break;
+    public void usersMedicalInsurace(long chatId){
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(QUESTION_ABOUT_MEDICAL_INSURACE);
+        InlineKeyboardMarkup inlineKeyboardMarkupOf_MedIns = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> inlineKeyboardButtonsListOf_MedIns = new ArrayList<>();
+
+        List<InlineKeyboardButton> inlineKeyboardButtonsOfMedIns = new ArrayList<>();
+
+        InlineKeyboardButton publicButtton = new InlineKeyboardButton();
+        publicButtton.setText("Public");
+        publicButtton.setCallbackData("User_public_Ins");
+
+        InlineKeyboardButton privateButtton = new InlineKeyboardButton();
+        privateButtton.setText("Private");
+        privateButtton.setCallbackData("User_private_Ins");
+
+
+        inlineKeyboardButtonsOfMedIns.add(publicButtton);
+        inlineKeyboardButtonsOfMedIns.add(privateButtton);
+
+        inlineKeyboardButtonsListOf_MedIns.add(inlineKeyboardButtonsOfMedIns);
+        inlineKeyboardMarkupOf_MedIns.setKeyboard(inlineKeyboardButtonsListOf_MedIns);
+        message.setReplyMarkup(inlineKeyboardMarkupOf_MedIns);
+        try {
+            execute(message);
+        }catch (TelegramApiException e){
+            throw new RuntimeException(e);
         }
 
-    }
-
-    public void usersMedicalInsurace(long chatId, String messageText){
-        sendMessage(chatId, QUESTION_ABOUT_MEDICAL_INSURACE);
-        switch (messageText){
-            case "private":
-                boolean publicInsurace = false;
-                usersSalary(chatId, messageText);
-                break;
-            case "public":
-                publicInsurace = true;
-                usersSalary(chatId, messageText);
-                break;
-        }
 
     }
+    public void indefyTaxGroup(boolean isMarried, boolean children, long chatId, double usersSalaryData, boolean usersSalaryMore, boolean usersSalarySame,boolean extraWork){
+        usersTaxGroup1(isMarried, children, chatId, usersSalaryData);
+        usersTaxGroup2(isMarried, children, chatId, usersSalaryData);
+        usersTaxGroup3(isMarried, chatId, usersSalaryMore, usersSalaryData);
+        usersTaxGroup4(isMarried, usersSalarySame, chatId, children, usersSalaryData);
+        usersTaxGroup5(isMarried, usersSalaryMore, chatId, usersSalaryData);
+        usersTaxGroup6(extraWork, chatId, usersSalaryData);
+    }
 
-    public void usersSalary(long chatId, String messageText){
-        sendMessage(chatId, QUESTION_ABOUT_SALARY);
-        double usersSalaryData = Integer.parseInt(messageText);
-        usersProfession(chatId, messageText);
-    }
-    public void usersProfession(long chatId, String messageText){
-        sendMessage(chatId, QUESTION_ABOUT_PROFESSION);
-        String usersProfession = messageText;
-    }
     private void usersTaxGroup1(boolean isMarried, boolean children, long chatId, double usersSalaryData){
     if((isMarried=false) && (children=false)){
         boolean usersTaxClass1 = true;
